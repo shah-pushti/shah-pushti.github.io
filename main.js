@@ -1,6 +1,7 @@
 (function () {
   "use strict";
   document.documentElement.classList.remove("no-js");
+  document.documentElement.classList.add("js");
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- Hero: examination lamp over epithelium ---------- */
@@ -228,9 +229,60 @@
         }
       });
     }, { threshold: 0.1 });
-    document.querySelectorAll(".degrees, .panels").forEach(function (el) { io.observe(el); });
+    document.querySelectorAll(".degrees, .panels, .fields").forEach(function (el) { io.observe(el); });
   } else {
-    document.querySelectorAll(".degrees").forEach(function (el) { el.classList.add("is-drawn"); });
+    document.querySelectorAll(".degrees, .fields").forEach(function (el) { el.classList.add("is-drawn"); });
+  }
+
+  /* ---------- Hero: name and greeting ---------- */
+  var nm = document.querySelector(".hero__nm");
+  if (nm && !reduce) {
+    var full = nm.textContent, n = 0;
+    nm.textContent = "";
+    var vh = document.createElement("span"); vh.className = "vh"; vh.textContent = full; nm.appendChild(vh);
+    full.split(" ").forEach(function (word, w) {
+      if (w) nm.appendChild(document.createTextNode(" "));
+      var ws = document.createElement("span"); ws.className = "w"; ws.setAttribute("aria-hidden", "true");
+      word.split("").forEach(function (ch) {
+        var l = document.createElement("i"); l.textContent = ch; l.style.setProperty("--i", n++); ws.appendChild(l);
+      });
+      nm.appendChild(ws);
+    });
+  }
+  var hello = document.querySelector(".hello");
+  if (hello && !reduce) {
+    var words = hello.getAttribute("data-words").split("|"), wi = 0;
+    setInterval(function () {
+      hello.classList.add("is-out");
+      setTimeout(function () { wi = (wi + 1) % words.length; hello.textContent = words[wi]; hello.classList.remove("is-out"); }, 350);
+    }, 2600);
+  }
+
+  /* ---------- Scroll: page progress and the path line ---------- */
+  var prog = document.querySelector(".prog"), stops = path ? path.querySelectorAll(".stop") : [], ticking = false;
+  function onScroll() {
+    ticking = false;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    if (prog) prog.style.setProperty("--p", max > 0 ? Math.min(1, window.scrollY / max) : 0);
+    if (path) {
+      var pr = path.getBoundingClientRect(), mark = window.innerHeight * 0.62;
+      path.style.setProperty("--prog", Math.max(0, Math.min(1, (mark - pr.top) / pr.height)) * 100 + "%");
+      stops.forEach(function (s) { if (s.getBoundingClientRect().top < mark) s.classList.add("is-on"); });
+    }
+  }
+  window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  window.addEventListener("resize", onScroll);
+  onScroll();
+
+  /* ---------- Evidence: swipe between steps ---------- */
+  var pn = document.querySelector(".panels"), sx = null;
+  if (pn) {
+    pn.addEventListener("touchstart", function (e) { sx = e.touches[0].clientX; }, { passive: true });
+    pn.addEventListener("touchend", function (e) {
+      if (sx === null) return;
+      var dx = e.changedTouches[0].clientX - sx; sx = null;
+      if (Math.abs(dx) > 60) select(current + (dx < 0 ? 1 : -1));
+    });
   }
 
   /* ---------- Copy email ---------- */
