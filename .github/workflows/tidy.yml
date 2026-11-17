@@ -1,0 +1,16 @@
+name: tidy
+on: push
+permissions:
+  contents: write
+jobs:
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git rm -q site.css site.js fonts/inter-regular.woff fonts/inter-semibold.woff fonts/lmroman12.woff fonts/lmroman17.woff
+          git rm -q .github/workflows/tidy.yml
+          git config user.name "Pushti Shah"
+          git config user.email "shah-pushti@users.noreply.github.com"
+          git commit -q -m "Remove unused stylesheet, script and font files"
+          git push
