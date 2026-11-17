@@ -146,6 +146,7 @@
 
 .sources{padding-left:1.3em;font-size:.95rem}
 .sources li+li{margin-top:.6em}
+.art-data{font-size:.95rem;margin-top:28px}
 .art-note{font-size:.92rem;color:var(--ink-2);padding-top:14px;border-top:1px solid var(--mist)}
 
 .more{max-width:var(--w);margin:clamp(56px,8vw,88px) auto 0;padding:0 var(--gut)}

@@ -184,6 +184,21 @@
     fig.classList.remove("is-drawn");
     void fig.offsetWidth;
     requestAnimationFrame(function () { fig.classList.add("is-drawn"); });
+    count(panel, fig);
+  }
+  /* the headline number counts up while its dots fill */
+  function count(panel, fig) {
+    var st = panel.querySelector(".result strong"), n = +fig.dataset.dots;
+    if (!st || !n || reduce) return;
+    var full = st.dataset.t || (st.dataset.t = st.textContent), t0 = 0, id = (st._c = (st._c || 0) + 1);
+    function tick(ts) {
+      if (id !== st._c) return;
+      if (!t0) t0 = ts;
+      var k = Math.min(1, (ts - t0) / 650);
+      st.textContent = full.replace(/\d+/, Math.round(10 + (n - 10) * k));
+      if (k < 1) requestAnimationFrame(tick); else st.textContent = full;
+    }
+    requestAnimationFrame(tick);
   }
   function select(i, focus) {
     current = (i + tabs.length) % tabs.length;
@@ -249,12 +264,13 @@
       nm.appendChild(ws);
     });
   }
+  function langOf(w) { return /[\u0900-\u097F]/.test(w) ? "hi" : /[\u0A80-\u0AFF]/.test(w) ? "gu" : w === "Hallo" ? "de" : "en"; }
   var hello = document.querySelector(".hello");
   if (hello && !reduce) {
     var words = hello.getAttribute("data-words").split("|"), wi = 0;
     setInterval(function () {
       hello.classList.add("is-out");
-      setTimeout(function () { wi = (wi + 1) % words.length; hello.textContent = words[wi]; hello.classList.remove("is-out"); }, 350);
+      setTimeout(function () { wi = (wi + 1) % words.length; hello.textContent = words[wi]; hello.lang = langOf(words[wi]); hello.classList.remove("is-out"); }, 350);
     }, 2600);
   }
 
@@ -302,6 +318,21 @@
       else say(v);
     });
   });
+
+  /* ---------- German browser on the English page: point to the German page ---------- */
+  var alt = document.querySelector('link[rel="alternate"][hreflang="de"]'), seen = false;
+  try { seen = localStorage.getItem("lang-hint") === "1"; } catch (e) {}
+  if (alt && document.documentElement.lang === "en" && /^de\b/i.test(navigator.language || "") && !seen) {
+    var hint = document.createElement("div");
+    hint.className = "lang-hint"; hint.lang = "de"; hint.setAttribute("role", "region"); hint.setAttribute("aria-label", "Sprachhinweis");
+    var ha = document.createElement("a"); ha.href = alt.href; ha.hreflang = "de"; ha.textContent = "Diese Seite auf Deutsch lesen";
+    var hb = document.createElement("button"); hb.type = "button"; hb.setAttribute("aria-label", "Hinweis schlie\u00dfen"); hb.textContent = "\u00d7";
+    var keep = function () { try { localStorage.setItem("lang-hint", "1"); } catch (e) {} };
+    hb.addEventListener("click", function () { keep(); hint.remove(); });
+    ha.addEventListener("click", keep);
+    hint.appendChild(ha); hint.appendChild(hb); document.body.appendChild(hint);
+    setTimeout(function () { hint.classList.add("is-on"); }, 1200);
+  }
 
   /* ---------- Current section in the bar ---------- */
   var links = document.querySelectorAll(".bar nav a");
