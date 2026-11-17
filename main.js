@@ -291,7 +291,13 @@
   document.querySelectorAll("[data-copy]").forEach(function (b) {
     b.addEventListener("click", function () {
       var v = b.dataset.copy;
-      var done = function () { var o = b.textContent; b.textContent = "Copied"; say("Email address copied"); setTimeout(function () { b.textContent = o; }, 1600); };
+      var de = document.documentElement.lang === "de";
+      var done = function () {
+        var l = b.querySelector(".copy__label") || b, o = l.textContent;
+        l.textContent = de ? "Kopiert" : "Copied"; b.classList.add("is-done");
+        say(de ? "E-Mail-Adresse kopiert" : "Email address copied");
+        setTimeout(function () { l.textContent = o; b.classList.remove("is-done"); }, 1600);
+      };
       if (navigator.clipboard) navigator.clipboard.writeText(v).then(done, function () { say(v); });
       else say(v);
     });
