@@ -65,7 +65,7 @@
 .lg__n{font-size:.95rem}
 .lg__n small{display:block;color:var(--ink-2);font-size:.82rem}
 .lg__v{font-family:var(--serif);font-size:1.25rem;text-align:right;line-height:1.1}
-.lg__v small{display:block;font-family:var(--sans);font-size:.75rem;color:var(--ink-2)}
+.lg__v small{display:block;font-family:var(--sans);font-size:.85rem;color:var(--ink-2)}
 .stage-note{grid-column:1/-1;margin:0;font-size:.95rem;min-height:3em;color:var(--ink)}
 @media (max-width:640px){.stage{grid-template-columns:1fr}.waf{max-width:260px}}
 
